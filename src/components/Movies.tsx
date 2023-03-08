@@ -2,7 +2,12 @@ import { useState } from "react";
 import renderStars from "../utils/renderStars";
 import styles from "./../styles/movie.module.css";
 import Link from "next/link";
-import { useMoviesQuery, useSearchQuery, useGenres } from "@/hooks";
+import {
+  useMoviesQuery,
+  useSearchQuery,
+  useGenres,
+  useDiscoverGenres,
+} from "@/hooks";
 
 export type Movie = {
   id: number;
@@ -19,26 +24,31 @@ const Movies = () => {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [selectedGenre, setSelectedGenre] = useState<number[]>([]);
-  
-  const {
-    data: moviesData,
-  } = useMoviesQuery(page, query, selectedGenre);
 
-  
-
-  const { data: searchData } = useSearchQuery(query);
-  
-  const data = query ? searchData : moviesData;
-
+  const { data: moviesData } = useMoviesQuery(page);
   const { data: genresData } = useGenres();
+  const { data: searchData } = useSearchQuery(query, page);
+  
+  const filteredMovies = useDiscoverGenres(
+    selectedGenre[0] || 0,
+    page
+  )?.dataDiscover?.movies.filter(
+    (movie) =>
+      selectedGenre.length === 0 || // check if no genres are selected
+      movie.genre_ids.some((genreId) => selectedGenre.includes(genreId))
+  );
+  
+  const data = query ? searchData?.movies : filteredMovies;
+    
+  console.log(searchData)
+
   const genres = genresData?.genres.reduce((map, genre) => {
     map[genre.id] = genre.name;
     return map;
   }, {} as { [id: number]: string });
-  
 
   let pageNumberArray: number[] = [];
-  if (data && data.movies.length > 0) {
+  if (data) {
     const total_pages = query
       ? searchData?.total_pages
       : moviesData?.total_pages;
@@ -49,8 +59,6 @@ const Movies = () => {
     );
     pageNumberArray = [...Array(end - start + 1)].map((_, i) => i + start);
   }
-
-  
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
@@ -72,6 +80,8 @@ const Movies = () => {
     }
     setPage(1);
   };
+
+  
 
   return (
     <div>
@@ -101,48 +111,39 @@ const Movies = () => {
               {name}
             </button>
           ))}
-      </div>
+      </div>  
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-        {data?.movies
-          .filter(
-            (movie) =>
-              selectedGenre.length === 0 || // check if no genres are selected
-              movie.genre_ids.some((genreId) =>
-                selectedGenre.includes(genreId)
-              )
-          )
-          .map((movie) => (
-            <div key={movie.id} className="bg-black shadow overflow-hidden">
-              <Link href={`movie/${movie.id}`}>
-                <img
-                  src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                  alt={movie.title}
-                  width="500"
-                  height="500"
-                />
-              </Link>
-              <div className="bg-black">
-                <h2 className={styles.font}>{movie.title}</h2>
-                <p className="text-gray-300 text-sm">
-                  {movie.original_language.toUpperCase()} | {movie.release_date}
-                </p>
-                <div className="flex items-center">
-                  <div>{renderStars(movie.vote_average)}</div>
-                  <span className="text-yellow-500 text-sm ml-2 ">
-                    {movie.vote_average}
-                  </span>
-                </div>
-                
+        {data?.map((movie) => (
+          <div key={movie.id} className="bg-black shadow overflow-hidden">
+            <Link href={`movie/${movie.id}`}>
+              <img
+                src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                alt={movie.title}
+                width="500"
+                height="500"
+              />
+            </Link>
+            <div className="bg-black">
+              <h2 className={styles.font}>{movie.title}</h2>
+              <p className="text-gray-300 text-sm">
+                {movie.original_language.toUpperCase()} | {movie.release_date}
+              </p>
+              <div className="flex items-center">
+                <div>{renderStars(movie.vote_average)}</div>
+                <span className="text-yellow-500 text-sm ml-2 ">
+                  {movie.vote_average}
+                </span>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
       <div className="flex justify-center mt-4">
         {pageNumberArray.slice(0, 10).map((page) => (
           <button
             key={page}
             onClick={() => handlePageChange(page)}
-            className={`${  
+            className={`${
               page + 1 === page
                 ? "bg-blue-500 text-white"
                 : "bg-white text-blue-500"

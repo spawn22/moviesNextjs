@@ -7,6 +7,24 @@ type MovieData = {
     total_pages: number;
 }
 
+// const useMoviesQuery = (genreId: number | null, page: number) => {
+//   return useQuery<MovieData>(
+//     ["discover", genreId, page],
+//     async () => {
+//         const {data} = await api.get(`/discover/movie`, {
+//           params: {
+//             with_genres: genreId,
+//             page,
+//           },
+//         });
+//         return {
+//             movies: data.results,
+//             total_pages: data.total_pages
+//         }
+//     },
+//   )
+// }
+
 
 const useMoviesQuery = (page: number, query: string = "", selectedGenre: number[] = []) => {
   return useQuery<MovieData>(

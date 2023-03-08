@@ -10,6 +10,7 @@
     const [page, setPage] = useState(1);
     const [query, setQuery] = useState("");
     const { tvShows } = useTvShows(page);
+   
     const { data: searchTv } = useTvShowsSearch(query);
 
     const data = query ? searchTv : tvShows;

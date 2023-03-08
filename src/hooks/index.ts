@@ -1,3 +1,4 @@
+export { default as useDiscoverGenres } from './useDiscoverGenres';
 export { default as useGenres } from './useGenres';
 export { default as useMoviesQuery } from './useMoviesQuery';
 export { default as useReviews } from './useReviews';
