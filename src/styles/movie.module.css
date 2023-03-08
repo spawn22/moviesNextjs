@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'SF Movie Poster Bold Oblique';
+    src: url('../assets/SF\ Movie\ Poster\ Bold\ Oblique.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.font{
+    font-family: "SF Movie Poster Bold Oblique", sans-serif;
+    font-size: 3em;
+    display: flex;
+    justify-content: center;
+}
+
+.fontd{
+    font-family: "SF Movie Poster Bold Oblique", sans-serif;
+    font-size: 6em;
+    display: flex;
+    justify-content: center;
+}
