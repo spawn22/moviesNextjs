@@ -9,14 +9,14 @@
     const TvShows = () => {
     const [page, setPage] = useState(1);
     const [query, setQuery] = useState("");
-    const { data: tv } = useTvShows(page);
+    const { tvShows } = useTvShows(page);
     const { data: searchTv } = useTvShowsSearch(query);
 
-    const data = query ? searchTv : tv;
+    const data = query ? searchTv : tvShows;
 
     let pageNumberArray: number[] = [];
     if (data && data.tv.length > 0) {
-        const total_pages = query ? searchTv?.total_pages : tv?.total_pages;
+        const total_pages = query ? searchTv?.total_pages : tvShows?.total_pages;
         const start = Math.max(1, page - 4);
         const end = Math.min(
         start + 8,
